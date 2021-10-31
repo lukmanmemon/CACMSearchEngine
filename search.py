@@ -32,3 +32,29 @@ for word in sorted_query_terms:
     df = dictionary[word]
     idf = math.log(3204 / df, 10)
     terms_idf[word] = idf
+
+# Get vectors for each document and store in dictionary
+document_vectors_dict = {}
+for id in range(1, 3205):
+    document_vector = np.zeros((len(query_terms)), dtype=float)
+    index = 0
+    for term in sorted_query_terms:
+        # Get weight by idf * tf
+        try:
+            document_vector[index] = terms_idf[term] * postings_list[term][id][1]
+        except KeyError:
+            document_vector[index] = 0
+        index = index + 1
+
+    document_vectors_dict[id] = document_vector
+
+# Calculate document vector lengths and store in dictionary
+document_vector_lengths = {}
+for id, vector in document_vectors_dict.items():
+    sum = 0
+    length = 0
+    for weight in vector:
+        sum = sum + weight ** 2
+        
+    length = math.sqrt(sum)
+    document_vector_lengths[id] = length
