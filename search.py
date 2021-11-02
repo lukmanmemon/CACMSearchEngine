@@ -3,8 +3,7 @@ import math
 import numpy as np
 import collections
 from nltk.tokenize import word_tokenize
-from invert import title_list
-from invert import author_list
+from invert import *
 
 with open('dict.txt') as dict_file:
     dict_data = dict_file.read()
@@ -88,7 +87,6 @@ qvector_length = math.sqrt(qvector_sum)
 
 # Calculate cosine similarity
 cosine_similarity = {}
-
 for id in range(1, 3205):
     similarity_score = 0
     similarity_score = (document_vectors_dict[id].dot(query_vector)) / (document_vector_lengths[id] * qvector_length)
@@ -104,5 +102,5 @@ sorted_cosine_similarity = cosine_similarity_collection.most_common()
 topK_rel_documents = cosine_similarity_collection.most_common(10)
 rank = 1
 for key, value in topK_rel_documents:
-    print("Rank: " + str(rank), "Document: " + str(key), "Score: " + str(value), "Title: " + title_list[key], "Author: " + author_list[key])
+    print("Rank: " + str(rank), "Document: " + str(key), "Score: " + str(value), "Title: " + title_list[key], "Author(s): " + author_list[key])
     rank = rank + 1
