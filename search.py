@@ -3,6 +3,7 @@ import math
 import numpy as np
 import collections
 from nltk.tokenize import word_tokenize
+from nltk.stem import PorterStemmer
 from invert import *
 
 with open('dict.txt') as dict_file:
@@ -23,8 +24,22 @@ query_input = input("\nEnter a query: ").lower()
 # Split input query into tokens
 query_tokens = word_tokenize(query_input)
 
-# Filter list to keep terms that are in dictionary
-query_terms = [word for word in query_tokens if word in dictionary]
+stemming_on = False
+ps = PorterStemmer()
+toggle_stemming = sys.argv[2]
+
+if toggle_stemming == 'ON':
+    stemming_on = True
+    
+# Filter list and apply stemming if needed
+query_terms = []
+for word in query_tokens:
+    if stemming_on == True:
+        word = ps.stem(word)
+    
+    if word in dictionary:
+        query_terms.append(word)
+
 sorted_query_terms = sorted(query_terms)
 final_query_terms = []
 [final_query_terms.append(word) for word in sorted_query_terms if word not in final_query_terms]
@@ -102,5 +117,8 @@ sorted_cosine_similarity = cosine_similarity_collection.most_common()
 topK_rel_documents = cosine_similarity_collection.most_common(10)
 rank = 1
 for key, value in topK_rel_documents:
-    print("Rank: " + str(rank), "Document: " + str(key), "Score: " + str(value), "Title: " + title_list[key], "Author(s): " + author_list[key])
+    print("Rank: " + str(rank), "Document: " + str(key), "Score: " + str(value), "Title: " + title_list[key], "Author: " + author_list[key])
     rank = rank + 1
+
+print(query_terms)
+print(final_query_terms)
