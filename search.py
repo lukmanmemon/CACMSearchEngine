@@ -1,9 +1,10 @@
 import ast
 import math
 import numpy as np
-from operator import itemgetter
-import nltk
-nltk.download('punkt')
+import collections
+from nltk.tokenize import word_tokenize
+from invert import title_list
+from invert import author_list
 
 with open('dict.txt') as dict_file:
     dict_data = dict_file.read()
@@ -21,11 +22,13 @@ postings_list = ast.literal_eval(postings_data)
 query_input = input("\nEnter a query: ").lower()
 
 # Split input query into tokens
-query_tokens = nltk.word_tokenize(query_input)
+query_tokens = word_tokenize(query_input)
 
 # Filter list to keep terms that are in dictionary
 query_terms = [word for word in query_tokens if word in dictionary]
 sorted_query_terms = sorted(query_terms)
+final_query_terms = []
+[final_query_terms.append(word) for word in sorted_query_terms if word not in final_query_terms]
 
 # Get query term frequencies
 query_terms_frequencies = {}
@@ -37,7 +40,7 @@ for word in sorted_query_terms:
 
 # Add idf of query terms to dictionary
 terms_idf = {}
-for word in sorted_query_terms:
+for word in final_query_terms:
     df = dictionary[word]
     idf = math.log(3204 / df, 10)
     terms_idf[word] = idf
@@ -45,9 +48,9 @@ for word in sorted_query_terms:
 # Get vectors for each document and store in dictionary
 document_vectors_dict = {}
 for id in range(1, 3205):
-    document_vector = np.zeros((len(query_terms)), dtype=float)
+    document_vector = np.zeros((len(final_query_terms)), dtype=float)
     index = 0
-    for term in sorted_query_terms:
+    for term in final_query_terms:
         # Get weight by idf * tf
         try:
             document_vector[index] = terms_idf[term] * postings_list[term][id][1]
@@ -69,9 +72,9 @@ for id, vector in document_vectors_dict.items():
     document_vector_lengths[id] = length
 
 # Get query vector
-query_vector = np.zeros((len(query_terms)), dtype=float)
+query_vector = np.zeros((len(final_query_terms)), dtype=float)
 q_index = 0
-for term in sorted_query_terms:
+for term in final_query_terms:
      # Get weight by idf * tf
     query_vector[q_index] = terms_idf[term] * query_terms_frequencies[term]
     q_index = q_index + 1
@@ -89,5 +92,17 @@ cosine_similarity = {}
 for id in range(1, 3205):
     similarity_score = 0
     similarity_score = (document_vectors_dict[id].dot(query_vector)) / (document_vector_lengths[id] * qvector_length)
+    if math.isnan(similarity_score):
+        similarity_score = 0
+
     cosine_similarity[id] = similarity_score
 
+cosine_similarity_collection = collections.Counter(cosine_similarity)
+# Sort collection of scores in descending order
+sorted_cosine_similarity = cosine_similarity_collection.most_common()
+# Get top K relevant documents
+topK_rel_documents = cosine_similarity_collection.most_common(10)
+rank = 1
+for key, value in topK_rel_documents:
+    print("Rank: " + str(rank), "Document: " + str(key), "Score: " + str(value), "Title: " + title_list[key], "Author: " + author_list[key])
+    rank = rank + 1

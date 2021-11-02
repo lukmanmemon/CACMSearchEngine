@@ -33,13 +33,13 @@ for document in document_list:
     check_duplicates = []
 
     for line in shortened_document:
-        for word in line.split():
-            stripped_word = word.strip(string.punctuation).lower()
-            if stripped_word in check_duplicates:
+        for word in word_tokenize(line):
+            lowercase_word = word.lower()
+            if lowercase_word in check_duplicates:
                 continue
             
-            check_duplicates.append(stripped_word)
-            terms_list.append(stripped_word)
+            check_duplicates.append(lowercase_word)
+            terms_list.append(lowercase_word)
     check_duplicates.clear()
 
 # Remove all occurences of '.W' in list
@@ -112,11 +112,43 @@ title_index = 1
 for document in document_list:
     for line in document:
         if prev_line_starts_with == True:
-            title_list[title_index] = line
+            if line == '.W':
+                title_list[title_index] = "No title"
+            else:
+                title_list[title_index] = line
             prev_line_starts_with = False
         if line.startswith('.T'):
             prev_line_starts_with = True
     title_index = title_index + 1
+
+# Get authors from documents
+author_list = {}
+author_index = 0
+for document in document_list:
+    author_index = author_index + 1
+    if '.A' not in document:
+        author_list[author_index] = "No author(s)"
+        continue
+
+    shortened_document = []
+    start = document.index('.A')
+    if '.K' in document:
+        stop = document.index('.K')
+        shortened_document = document[start+1:stop]
+    elif '.C' in document:
+        stop = document.index('.C')
+        shortened_document = document[start+1:stop]
+    elif '.X' in document: 
+        stop = document.index('.X')
+        shortened_document = document[start+1:stop]
+    else:
+        shortened_document = document[start+1:]
+    
+    for line in shortened_document:
+        if author_index in author_list:
+            author_list[author_index] = author_list[author_index] + " " + line
+        else: 
+            author_list[author_index] = line
 
 # Add terms to postings list with ID, TF, positions
 postings_list = {}
@@ -128,33 +160,34 @@ tf_counter = {}
 for document in document_list_posting:
     
     for line in document:
-        for word in line.split():
-            if word == '.W':
+        
+        for word in word_tokenize(line):
+            if word == '.W' or word in string.punctuation:
                 continue
-            stripped_word = word.strip(string.punctuation).lower()
+            lowercase_word = word.lower()
 
             if stemming_on:
-                stripped_word = ps.stem(stripped_word)
+                lowercase_word = ps.stem(lowercase_word)
 
-            if stripped_word in tf_counter:
-                tf_counter[stripped_word] = tf_counter[stripped_word] + 1
+            if lowercase_word in tf_counter:
+                tf_counter[lowercase_word] = tf_counter[lowercase_word] + 1
             else:
-                tf_counter[stripped_word] = 1
+                tf_counter[lowercase_word] = 1
 
             position = position + 1
-            if stripped_word in position_counter:
-                position_counter[stripped_word].append(position)
+            if lowercase_word in position_counter:
+                position_counter[lowercase_word].append(position)
             else:
-                position_counter[stripped_word] = [position]
+                position_counter[lowercase_word] = [position]
             
-            if stripped_word not in postings_list:
-                postings_list[stripped_word] = {id: [title_list[id], tf_counter[stripped_word], position_counter[stripped_word]]}
+            if lowercase_word not in postings_list:
+                postings_list[lowercase_word] = {id: [title_list[id], tf_counter[lowercase_word], position_counter[lowercase_word]]}
 
-            if stripped_word in postings_list and id not in postings_list[stripped_word].keys():
-                postings_list[stripped_word][id] = [title_list[id], tf_counter[stripped_word], position_counter[stripped_word]]
+            if lowercase_word in postings_list and id not in postings_list[lowercase_word].keys():
+                postings_list[lowercase_word][id] = [title_list[id], tf_counter[lowercase_word], position_counter[lowercase_word]]
 
-            if stripped_word in postings_list and id in postings_list[stripped_word].keys():
-                postings_list[stripped_word][id] = [title_list[id], tf_counter[stripped_word], position_counter[stripped_word]]
+            if lowercase_word in postings_list and id in postings_list[lowercase_word].keys():
+                postings_list[lowercase_word][id] = [title_list[id], tf_counter[lowercase_word], position_counter[lowercase_word]]
 
     id = id + 1
     position = 0
@@ -163,8 +196,6 @@ for document in document_list_posting:
 
     for key in position_counter:
         position_counter[key] = []
-
-# sorted(postings_list.items(), key=lambda e: e[1][1], reverse=True)
 
 # Open txt file and write postings list to it
 write_file_postings = open("postings.txt","w")
