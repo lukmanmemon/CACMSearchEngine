@@ -5,8 +5,6 @@ import sys
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
 
-start = time.time()
-
 dictionary = {}
 document_list = []
 terms_list = []
