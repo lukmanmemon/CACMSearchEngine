@@ -39,14 +39,32 @@
 }
 
 .inner-header {
-  background: #7a4c75;
+  background: white;
   /* min-height: 60%; */
-  width: 60vw;
+  width: 80%;
   padding: 2%;
-  border-radius: 10% !important;
+  overflow: hidden;
+  border-radius: 5vh;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
+
 
 
 .search-box {
   background: #d1e7fe;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1vh;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  min-height: 10vh;
+  padding: 1vh;
+}
+
+h1 {
+  color: black;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  font-family: 'Aleo', serif;
 }
