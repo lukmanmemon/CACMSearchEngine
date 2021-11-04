@@ -57,7 +57,7 @@ def index(request):
         for term in final_query_terms:
             # Get weight by idf * tf
             try:
-                document_vector[index] = terms_idf[term] * postings_list[term][id][1]
+                document_vector[index] = terms_idf[term] * (1 + math.log(postings_list[term][id][1], 10))
             except KeyError:
                 document_vector[index] = 0
             index = index + 1
@@ -80,7 +80,7 @@ def index(request):
     q_index = 0
     for term in final_query_terms:
         # Get weight by idf * tf
-        query_vector[q_index] = terms_idf[term] * query_terms_frequencies[term]
+        query_vector[q_index] = terms_idf[term] * (1 + math.log(query_terms_frequencies[term], 10))
         q_index = q_index + 1
 
     # Calculate query vector length
