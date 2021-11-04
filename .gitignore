@@ -16,7 +16,7 @@ web/client/node_modules
 /coverage
 
 # production
-web/client/build
+# web/client/build Uncomment for assignment submission for ease of access for TA
 
 # misc
 .DS_Store
