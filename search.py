@@ -103,7 +103,10 @@ def search(query_input):
     cosine_similarity = {}
     for id in range(1, 3205):
         similarity_score = 0
-        similarity_score = (document_vectors_dict[id].dot(query_vector)) / (document_vector_lengths[id] * qvector_length)
+        if document_vector_lengths[id] == 0:
+            similarity_score = 0
+        else :
+            similarity_score = (document_vectors_dict[id].dot(query_vector)) / (document_vector_lengths[id] * qvector_length)
         if math.isnan(similarity_score):
             similarity_score = 0
 
