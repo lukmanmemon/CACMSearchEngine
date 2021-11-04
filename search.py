@@ -55,7 +55,7 @@ def search(query_input):
     terms_idf = {}
     for word in final_query_terms:
         df = dictionary[word]
-        idf = math.log(3204 / df, 10)
+        idf = math.log(1 + (3204 / df), 10)
         terms_idf[word] = idf
 
     # Get vectors for each document and store in dictionary
@@ -66,7 +66,7 @@ def search(query_input):
         for term in final_query_terms:
             # Get weight by idf * tf
             try:
-                document_vector[index] = terms_idf[term] * postings_list[term][id][1]
+                document_vector[index] = terms_idf[term] * (1 + math.log(postings_list[term][id][1], 10))
             except KeyError:
                 document_vector[index] = 0
             index = index + 1
@@ -89,7 +89,7 @@ def search(query_input):
     q_index = 0
     for term in final_query_terms:
         # Get weight by idf * tf
-        query_vector[q_index] = terms_idf[term] * query_terms_frequencies[term]
+        query_vector[q_index] = terms_idf[term] * (1 + math.log(query_terms_frequencies[term], 10))
         q_index = q_index + 1
 
     # Calculate query vector length
