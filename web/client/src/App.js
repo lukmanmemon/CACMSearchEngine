@@ -79,13 +79,12 @@ function App() {
            <img src={loading} className="logo" alt="Logo " />
           </div>
         }
+        {data !== null && 
+          <p>Top 10 Results ({data['Time']} seconds)</p>
+        }
         {data !== null &&
          Object.keys(data).map((type) => {
-           if (type === "Time") {
-             return(
-               <p>Top 10 Results ({data[type]} seconds)</p>
-             )
-           } else {
+           if (type !== "Time") {
             console.log(type)
             console.log(colours[(type % (colours.length - 1))])
             return (
