@@ -9,6 +9,7 @@ from search.invert import *
 def index(request):
     stopwords = request.GET.get('stopwords', 'OFF')
     stemming = request.GET.get('stemming', 'OFF')
+    starting_time = time.time()
     title_list, author_list = invert(stopwords, stemming)
     with open('search/dict.txt') as dict_file:
         dict_data = dict_file.read()
@@ -106,7 +107,7 @@ def index(request):
     topK_rel_documents = cosine_similarity_collection.most_common(10)
     rank = 1
     results = {}
-    results["Time"] = end = time.time() - start
+    results["Time"] = end = time.time() - starting_time
     for key, value in topK_rel_documents:
         results[rank] = {"Rank":str(rank), "Document": str(key), "Score": str(value), "Title":title_list[key], "Author(s)":author_list[key]}
         rank = rank + 1
