@@ -106,8 +106,8 @@ def index(request):
     topK_rel_documents = cosine_similarity_collection.most_common(10)
     rank = 1
     results = {}
+    results["Time"] = end = time.time() - start
     for key, value in topK_rel_documents:
         results[rank] = {"Rank":str(rank), "Document": str(key), "Score": str(value), "Title":title_list[key], "Author(s)":author_list[key]}
         rank = rank + 1
-    results["Time"] = end = time.time() - start
     return JsonResponse(results)

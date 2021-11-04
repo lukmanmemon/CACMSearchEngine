@@ -86,19 +86,18 @@ function App() {
                <p>Top 10 Results ({data[type]} seconds)</p>
              )
            } else {
-             
+            console.log(type)
+            console.log(colours[(type % (colours.length - 1))])
+            return (
+                <div className="data-card" style={{"background": colours[(type % (colours.length - 1))]}}>
+                  <p>Rank: {data[type]["Rank"]}</p>
+                  <p>Title: {data[type]["Title"]}</p>
+                  <p>Author(s): {data[type]["Author(s)"]}</p>
+                  <p>Document: {data[type]["Document"]}</p>
+                  <p>Score: {data[type]["Score"]}</p>
+                </div>
+            ) 
            }
-          console.log(type)
-          console.log(colours[(type % (colours.length - 1))])
-          return (
-              <div className="data-card" style={{"background": colours[(type % (colours.length - 1))]}}>
-                <p>Rank: {data[type]["Rank"]}</p>
-                <p>Document: {data[type]["Document"]}</p>
-                <p>Score: {data[type]["Score"]}</p>
-                <p>Title: {data[type]["Title"]}</p>
-                <p>Author(s): {data[type]["Author(s)"]}</p>
-              </div>
-          )
       })
         }
       </div>

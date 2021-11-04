@@ -8,8 +8,8 @@
 # testing
 /coverage
 
-# production
-/build
+# production Uncommment for assignment submission, easier for TA
+# /build
 
 # misc
 .DS_Store
